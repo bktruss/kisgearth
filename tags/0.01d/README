@@ -1,0 +1,83 @@
+                    KisGearth
+            (c) Richard Sammet (e-axe)
+         http://e-axe.mytty.org/kisgearth/
+
+
+INTRODUCTION
+------------
+kisgearth is a small perl script that gives you the
+possibility to convert your kismet xml logfiles
+to google earth kml files.
+you can apply a lot of filters and use sorting/ordering
+functions in order to get the best results.
+every time i tried kismets gpsmap tool none of the
+mapservers were available. so i decided to write my own tool
+while using the best resources available.
+
+
+REQUIREMENTS
+------------
+perl (testet with v5.8.8 built for i686-linux)
+XML::Simple (http://search.cpan.org/dist/XML-Simple/lib/XML/Simple.pm)
+Class::Struct (http://search.cpan.org/~nwclark/perl-5.8.8/lib/Class/Struct.pm)
+kismet xml logfile (testet with http://kismetwireless.net/kismet-3.1.0.dtd)
+
+
+EXAMPLES
+--------
+./kisgearth.pl -d -oN output.kml -O 1 -r -n 2 -fS samplessid -- Kismet-Mar-02-2007-4.xml
+
+this command generates the file output.kml, ordered the networks
+based on their channel, calculates the range of the networks,
+draw the colors based on channels, filters on SSID samplessid and
+reads Kismet-Mar-02-2007-4.xml as input file.
+
+try it, you will see it is as easy as 1,2,3 ;)
+
+
+BUGS & FEATURES
+---------------
+drop me a line (or multiple) to
+richard[tod]sammet[ta]gmail[tod]com
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+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
+ZOoWb4tZJGwTUVubd4DEcA==
+=EAqL
+-----END PGP PUBLIC KEY BLOCK-----
