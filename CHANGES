@@ -4,6 +4,20 @@ KisGearth - Changelog
 a summary of all changes...
 
 --
+version 0.01e
+--
+  improved AP positioning system added (-G/--gps).
+  network color management improved; more colors available.
+  colors for the encryption states changed:
+    - AES-CCM = GREEN
+    - TKIP    = YELLOW
+    - WEP     = ORANGE
+    - None    = RED
+  added some more encryption information parsing.
+  you should take a close look at the "popups"
+  in googleearth for an encrypted network ;)
+
+--
 version 0.01d
 --
   improved ssid name encoding.
