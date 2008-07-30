@@ -3,7 +3,6 @@
 
 = Features planned =
 
-  * enhanced accuracy (AP positioning)   _e-axe: working on it_
   * 3D drawing
 
 
