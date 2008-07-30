@@ -2,10 +2,10 @@
 ################################################################################
 # KisGearth - a Kismet xml log to GoogleEarth kml converter
 ################################################################################
-# 0.01d - 2007.04.11 - by Richard Sammet (e-axe) richard.sammet@gmail.com
+# 0.01e - 2008.07.30 - by Richard Sammet (e-axe) richard.sammet@gmail.com
 ################################################################################
 # Information and latest version available at:
-# http://e-axe.mytty.org/kisgearth/
+# http://mytty.org/kisgearth/
 ################################################################################
 # This file is part of KisGearth.
 #
@@ -34,104 +34,382 @@ $| = 1;
 
 # constants
 my $CODENAME    = 'KisGearth';
-my $VERSION     = '0.01d';
+my $VERSION     = '0.01e';
 my $AUTHOR      = 'Richard Sammet (e-axe)';
 my $CONTACT     = 'richard.sammet@gmail.com';
-my $WEBSITE     = 'http://e-axe.mytty.org/kisgearth/';
+my $WEBSITE     = 'http://mytty.org/kisgearth/';
 
 # color constants
 # used for network drawing
-my $RED         = '0000ff';
-my $GREEN       = '00ff00';
-my $BLUE        = 'ff0000';
-my $PINK        = 'fc00ff';
-my $GREY        = '7e7e7e';
-my $YELLOW      = '00ffff';
-my $ORANGE      = '0090ff';
-my $PURPLE      = '941790';
-my $CYAN        = 'fcff00';
-my $WHITE       = 'ffffff';
-my $LIGHTBLUE   = 'ffd20b';
-my $LIGHTRED    = '8182ff';
-my $LIGHTGREEN  = '83ff80';
-my $LIGHTORANGE = '80beff';
+my $AliceBlue                 = 'F0F8FF';
+my $AntiqueWhite              = 'FAEBD7';
+my $Aquamarine1               = '7FFFD4';
+my $Azure1                    = 'F0FFFF';
+my $Beige                     = 'F5F5DC';
+my $Bisque1                   = 'FFE4C4';
+my $Black                     = '000000';
+my $BlanchedAlmond            = 'FFEBCD';
+my $Blue1                     = 'FF0000';
+my $BlueViolet                = '8A2BE2';
+my $Brown1                    = 'A52A2A';
+my $Burlywood1                = 'DEB887';
+my $Cadetblue1                = '5F9EA0';
+my $Chartreuse1               = '7FFF00';
+my $Chocolate1                = 'D2691E';
+my $Coral1                    = 'FF7F50';
+my $CornFlowerBlue            = '6495ED';
+my $Cornsilk1                 = 'FFF8DC';
+my $Cyan1                     = '00FFFF';
+my $DarkGoldenrod1            = 'B8860B';
+my $DarkGreen                 = '006400';
+my $DarkKhaki                 = 'BDB768';
+my $DarkOliveGreen1           = '556B2F';
+my $DarkOrange1               = 'FF8C00';
+my $DarkOrchid1               = '9932CC';
+my $DarkSalmon                = 'E9967A';
+my $DarkSeaGreen1             = '8FBC8F';
+my $DarkSlateBlue             = '483D8B';
+my $DarkSlateGray1            = '2F4F4F';
+my $DarkTurquoise             = '00CED1';
+my $DarkViolet                = '9400D3';
+my $DeepPink1                 = 'FF1493';
+my $DeepSkyBlue1              = '00BFFF';
+my $DimGray                   = '696969';
+my $DodgerBlue1               = '1E90FF';
+my $Firebrick1                = 'B22222';
+my $FloralWhite               = 'FFFAF0';
+my $ForestGreen               = '228B22';
+my $Gainsboro                 = 'DCDCDC';
+my $GhostWhite                = 'F8F8FF';
+my $Gold1                     = 'FFD700';
+my $Goldenrod1                = 'DAA520';
+my $Gray00                    = '7E7E7E';
+my $Gray47                    = '787878';
+my $Gray96                    = 'F5F5F5';
+my $Green1                    = '00FF00';
+my $GreenYellow               = 'ADFF2F';
+my $Honeydew1                 = 'F0FFF0';
+my $HotPink1                  = 'FF69B4';
+my $IndianRed1                = 'CD5C5C';
+my $Ivory1                    = 'FFFFF0';
+my $Khaki1                    = 'F0E68C';
+my $LavenderBlush1            = 'FFF0F5';
+my $LawnGreen                 = '7CFC00';
+my $LemonChiffon1             = 'FFFACD';
+my $LightBlue1                = 'ADD8E6';
+my $LightCoral                = 'F08080';
+my $LightCyan1                = 'E0FFFF';
+my $Lightgoldenrod1           = 'EEDD82';
+my $LightGoldenrodYellow      = 'FAFAD2';
+my $LightGray                 = 'D3D3D3';
+my $LightPink1                = 'FFB6C1';
+my $LightSalmon1              = 'FFA07A';
+my $LightSeaGreen             = '20B2AA';
+my $LightLightSkyBlue1        = '87CEFA';
+my $LightSkyBlue2             = 'B0E2FF';
+my $LightSlateBlue            = '8470FF';
+my $LightSlateGray            = '778899';
+my $LightSteelBlue1           = 'B0C4DE';
+my $LightYellow1              = 'FFFFE0';
+my $LimeGreen                 = '32CD32';
+my $Linen                     = 'FAF0E6';
+my $Magenta1                  = 'FF00FF';
+my $Maroon1                   = 'B03060';
+my $MediumAquamarine          = '66CDAA';
+my $MediumBlue                = '0000CD';
+my $MediumOrchid1             = 'BA55D3';
+my $MediumPurple1             = '9370DB';
+my $MediumSeaGreen            = '3CB371';
+my $MediumSlateBlue           = '7B68EE';
+my $MediumSpringGreen         = '00FA9A';
+my $MediumTurquoise           = '48D1CC';
+my $MediumvioletRed           = 'C71585';
+my $MidnightBlue              = '191970';
+my $MintCreme                 = 'F5FFFA';
+my $Mistyrose1                = 'FFE4E1';
+my $Moccasin                  = 'FFE4B5';
+my $NavajoWhite1              = 'FFDEAD';
+my $NavyBlue000080            = '000080';
+my $Oldlace                   = 'FDF5E6';
+my $OliveDrab1                = '6B8E23';
+my $Orange1                   = '0090FF';
+my $OrangeRed1                = 'FF4500';
+my $Orchid1                   = 'DA70D6';
+my $PaleGoldenrod             = 'EEE8AA';
+my $PaleGreen1                = '98FB98';
+my $PaleTurquoise1            = 'AFEEEE';
+my $PaleVioletred1            = 'DB7093';
+my $PapayaWhip                = 'FFEFD5';
+my $Peachpuff1                = 'FFDAB9';
+my $Peru                      = 'CD853F';
+my $Pink1                     = 'FFC0CB';
+my $Plum1                     = 'DDA0DD';
+my $PowderBlue                = 'B0E0E6';
+my $Purple1                   = 'A020F0';
+my $Red1                      = '0000FF';
+my $RoseGray                  = '706666';
+my $Roseybrown1               = 'FFC1C1';
+my $Royalblue1                = '4169E1';
+my $SaddleBrown               = '8B4513';
+my $Salmon1                   = 'FA8072';
+my $SandyBrown                = 'F4A460';
+my $Seagreen1                 = '2E8B57';
+my $Seashell1                 = 'FFF5EE';
+my $SergeBlue                 = '0000B4';
+my $Sienna1                   = 'A0522D';
+my $SkyBlue1                  = '87CEEB';
+my $SlateBlue1                = '836FFF';
+my $SlateGray1                = '708090';
+my $Snow1                     = 'FFFAFA';
+my $SpringGreen1              = '00FF7F';
+my $SteelBlue1                = '4682B4';
+my $Tan1                      = 'D2B48C';
+my $Thsitle1                  = 'D8BFD8';
+my $Thitle5                   = '8B7B8B';
+my $TimGray                   = '615C5C';
+my $Tomato1                   = 'FF6347';
+my $Turquoise1                = '40E0D0';
+my $Violet                    = 'EE82EE';
+my $VioletRed1                = 'D02090';
+my $Wheat1                    = 'F5DEB3';
+my $Yellow1                   = '00FFFF';
+
+my $RED         = $Red1;
+my $ORANGE      = $Orange1;
+my $YELLOW      = $Yellow1;
+my $GREEN       = $Green1;
+my $GREY        = $Gray00;
 
 # channel colors
 my @CHANCOL = (
-  "",             # dummy entry cause there is no chan. with nr. 0
-  "$RED",         # channel 1
-  "$GREEN",       # channel 2
-  "$BLUE",        # channel 3
-  "$PINK",        # channel 4
-  "$GREY",        # channel 5
-  "$YELLOW",      # channel 6
-  "$ORANGE",      # channel 7
-  "$PURPLE",      # channel 8
-  "$CYAN",        # channel 9
-  "$WHITE",       # channel 10
-  "$LIGHTBLUE",   # channel 11
-  "$LIGHTRED",    # channel 12
-  "$LIGHTGREEN",  # channel 13
-  "$LIGHTORANGE", # channel 14
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","",
-  "$RED",         # channel 34
-  "",
-  "$GREEN",       # channel 36
-  "",
-  "$BLUE",        # channel 38
-  "",
-  "$PINK",        # channel 40
-  "",
-  "$GREY",        # channel 42
-  "",
-  "$YELLOW",      # channel 44
-  "",
-  "$ORANGE",      # channel 46
-  "",
-  "$PURPLE",      # channel 48
-  "","","",
-  "$CYAN",        # channel 52
-  "","","",
-  "$WHITE",       # channel 56
-  "","","",
-  "$LIGHTBLUE",   # channel 60
-  "","","",
-  "$LIGHTRED",    # channel 64
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","","",
-  "","","","",
-  "$LIGHTGREEN",  # channel 149
-  "","","",
-  "$LIGHTORANGE", # channel 153
-  "","","",
-  "$RED",         # channel 157
-  "","","",
-  "$GREEN"        # channel 161
+      $AliceBlue,
+      $RED,
+      $ORANGE,
+      $YELLOW,
+      $GREEN,
+      $Aquamarine1,
+      $Azure1,
+      $Brown1,
+      $Burlywood1,
+      $Cadetblue1,
+      $Chartreuse1,
+      $Chocolate1,
+      $Coral1,
+      $CornFlowerBlue,
+      $Cornsilk1,
+      $Cyan1,
+      $DarkGoldenrod1,
+      $DarkGreen,
+      $DarkKhaki,
+      $DarkOliveGreen1,
+      $DarkOrange1,
+      $DarkOrchid1,
+      $DarkSalmon,
+      $DarkSeaGreen1,
+      $DarkSlateBlue,
+      $DarkSlateGray1,
+      $DarkTurquoise,
+      $DarkViolet,
+      $DeepPink1,
+      $DeepSkyBlue1,
+      $DimGray,
+      $DodgerBlue1,
+      $Firebrick1,
+      $FloralWhite,
+      $ForestGreen,
+      $Gainsboro,
+      $GhostWhite,
+      $Gold1,
+      $Goldenrod1,
+      $Gray00,
+      $Gray47,
+      $Gray96,
+      $Green1,
+      $GreenYellow,
+      $Honeydew1,
+      $HotPink1,
+      $IndianRed1,
+      $Ivory1,
+      $Khaki1,
+      $LavenderBlush1,
+      $LawnGreen,
+      $LemonChiffon1,
+      $LightBlue1,
+      $LightCoral,
+      $LightCyan1,
+      $Lightgoldenrod1,
+      $LightGoldenrodYellow,
+      $LightGray,
+      $LightPink1,
+      $LightSalmon1,
+      $LightSeaGreen,
+      $LightLightSkyBlue1,
+      $LightSkyBlue2,
+      $LightSlateBlue,
+      $LightSlateGray,
+      $LightSteelBlue1,
+      $LightYellow1,
+      $LimeGreen,
+      $Linen,
+      $Magenta1,
+      $Maroon1,
+      $MediumAquamarine,
+      $MediumBlue,
+      $MediumOrchid1,
+      $MediumPurple1,
+      $MediumSeaGreen,
+      $MediumSlateBlue,
+      $MediumSpringGreen,
+      $MediumTurquoise,
+      $MediumvioletRed,
+      $MidnightBlue,
+      $MintCreme,
+      $Mistyrose1,
+      $Moccasin,
+      $NavajoWhite1,
+      $NavyBlue000080,
+      $Oldlace,
+      $OliveDrab1,
+      $Orange1,
+      $OrangeRed1,
+      $Orchid1,
+      $PaleGoldenrod,
+      $PaleGreen1,
+      $PaleTurquoise1,
+      $PaleVioletred1,
+      $PapayaWhip,
+      $Peachpuff1,
+      $Peru,
+      $Pink1,
+      $Plum1,
+      $PowderBlue,
+      $Purple1,
+      $Red1,
+      $RoseGray,
+      $Roseybrown1,
+      $Royalblue1,
+      $SaddleBrown,
+      $Salmon1,
+      $SandyBrown,
+      $Seagreen1,
+      $Seashell1,
+      $SergeBlue,
+      $Sienna1,
+      $SkyBlue1,
+      $SlateBlue1,
+      $SlateGray1,
+      $Snow1,
+      $SpringGreen1,
+      $SteelBlue1,
+      $Tan1,
+      $Thsitle1,
+      $Thitle5,
+      $TimGray,
+      $Tomato1,
+      $Turquoise1,
+      $Violet,
+      $VioletRed1,
+      $Wheat1,
+      $Yellow1,
+      $AliceBlue,
+      $AntiqueWhite,
+      $Aquamarine1,
+      $Azure1,
+      $Beige,
+      $Bisque1,
+      $Black,
+      $BlanchedAlmond,
+      $Blue1,
+      $BlueViolet,
+      $Brown1,
+      $Burlywood1,
+      $Cadetblue1,
+      $Chartreuse1,
+      $Chocolate1,
+      $Coral1,
+      $CornFlowerBlue,
+      $Cornsilk1,
+      $Cyan1,
+      $DarkGoldenrod1,
+      $DarkGreen,
+      $DarkKhaki,
+      $DarkOliveGreen1,
+      $DarkOrange1,
+      $DarkOrchid1,
+      $DarkSalmon,
+      $DarkSeaGreen1,
+      $DarkSlateBlue,
+      $DarkSlateGray1,
+      $DarkTurquoise,
+      $DarkViolet,
+      $DeepPink1,
+      $DeepSkyBlue1,
+      $DimGray,
+      $DodgerBlue1,
+      $Firebrick1,
+      $FloralWhite,
+      $ForestGreen,
+      $Gainsboro,
+      $GhostWhite,
+      $Gold1,
+      $Goldenrod1,
+      $Gray00,
+      $Gray47,
+      $Gray96,
+      $Green1,
+      $GreenYellow,
+      $Honeydew1,
+      $HotPink1,
+      $IndianRed1,
+      $Ivory1,
+      $Khaki1,
+      $LavenderBlush1,
+      $LawnGreen,
+      $LemonChiffon1,
+      $LightBlue1,
+      $LightCoral,
+      $LightCyan1,
+      $Lightgoldenrod1,
+      $LightGoldenrodYellow,
+      $LightGray,
+      $LightPink1,
+      $LightSalmon1,
+      $LightSeaGreen,
+      $LightLightSkyBlue1,
+      $LightSkyBlue2,
+      $LightSlateBlue,
+      $LightSlateGray,
+      $LightSteelBlue1,
+      $LightYellow1,
+      $LimeGreen,
+      $Linen,
+      $Magenta1,
+      $Maroon1,
+      $MediumAquamarine,
+      $MediumBlue,
+      $MediumOrchid1,
+      $MediumPurple1,
+      $MediumSeaGreen,
+      $MediumSlateBlue,
+      $MediumSpringGreen,
+      $MediumTurquoise,
+      $MediumAquamarine,
+      $MediumvioletRed,
+      $MidnightBlue,
+      $MintCreme,
+      $RED,
+      $ORANGE,
+      $YELLOW,
+      $GREEN,
+      $Aquamarine1
 );
 
 # crypt state colors
 my @CRYPTCOL = (
-  "$RED",         # wpa2 -> AES-CCM
-  "$ORANGE",      # wpa  -> TKIP
-  "$YELLOW",      # wep
-  "$GREEN"        # none
+  $GREEN,       # wpa2 -> AES-CCM
+  $YELLOW,      # wpa  -> TKIP
+  $ORANGE,      # wep  -> WEP
+  $RED          # none -> None
 );
 
 # vaiable constants
@@ -174,7 +452,9 @@ my $TO            = "";     # ended
 # global variables
 my @networks        = ();
 my $net_count       = 0;
+my $gps_cnt         = 0;
 my $kismet_xml_file = '';
+my $kismet_gps_file = '';
 
 # these are our structures ;)
 struct IPaddress => {
@@ -227,6 +507,21 @@ struct Network => {
   ngpsinfo     =>  'Gpsinfo',
 };
 
+struct GPSpoint => {
+  bssid        =>  '$',
+  timesec      =>  '$',
+  timeusec     =>  '$',
+  lat          =>  '$',
+  lon          =>  '$',
+  alt          =>  '$',
+  spd          =>  '$',
+  heading      =>  '$',
+  fix          =>  '$',
+  signal       =>  '$',
+  quality      =>  '$',
+  noise        =>  '$',
+};
+
 # this is currently not in use!
 # is there an array or hash outta there ? ;)
 sub IsArray {
@@ -250,6 +545,8 @@ sub usage {
   print STDOUT " -d, --debug               Debug output while running\n";
   print STDOUT " -q, --quiet               Do not print anything on stdout (should be used as 1st opt)\n";
   print STDOUT " -V, --version             KisGearth Version\n";
+  print STDOUT " -G, --gps <file>          Also use the Kismet *.gps log. (recommended)\n";
+  print STDOUT "                           more accurate AP positioning.\n";
   print STDOUT " -oN <file>                Output converted data in GEarth kml format to\n";
   print STDOUT "                           the given filename\n";
   #print STDOUT " -oZ <file>                Output converted data in GEarth kmz format to\n";
@@ -408,6 +705,15 @@ sub process_opts {
         &my_print($ERROR, "Format error in given -a/--alpha value!");
         return -1;
       }
+    }elsif(($ARGV[$optcnt] eq '-G') or ($ARGV[$optcnt] eq '--gps')) {
+      if(-f $ARGV[$optcnt+1]) {
+        $kismet_gps_file = $ARGV[$optcnt+1];
+        &my_print($VERBOSE, "Using $kismet_gps_file as gps file ...");
+        $optcnt++;
+      }else{
+        &my_print($ERROR, "File not found (-G/--gps $kismet_gps_file)!");
+        return -1;
+      }
     }elsif($ARGV[$optcnt] eq '-oN') {
       if($ARGV[$optcnt+1] =~ m/^\-$/i) {
         $OUTFTYPE = "kml";
@@ -558,7 +864,7 @@ sub process_opts {
 } # sub process_opts
 
 # reading the xml file/s
-sub read_xml {
+sub read_k_xml {
 
   my $xml_file = $_[0];
   my $data     = "";
@@ -640,12 +946,68 @@ sub read_xml {
     }
   }
 
-  &my_print($VERBOSE, "\n");
+  #&my_print($VERBOSE, "\n");
   &my_print($VERBOSE, $net_count." networks imported.");
 
   return 0;
 
-} # sub read_xml
+} # sub read_k_xml
+
+# reading the xml file/s
+sub read_g_xml {
+
+  my $xml_file = $_[0];
+  my $data     = "";
+  my $procnt   = 0;
+  my $N        = "";
+  my $E        = "";
+  my $xml      = undef;
+
+  # create object
+  $xml = new XML::Simple (KeyAttr=>[]);
+
+  $data = $xml->XMLin("$xml_file");
+
+  &my_print($VERBOSE, "Storing data into our structures ...");
+
+  #$FROM = $data->{'start-time'};
+
+  foreach $N (@{$data->{'gps-point'}}) {
+
+    $GPSpoints[$gps_cnt] = GPSpoint->new();
+
+    $GPSpoints[$gps_cnt]->bssid($N->{'bssid'});
+    $GPSpoints[$gps_cnt]->timesec($N->{'time-sec'});
+    $GPSpoints[$gps_cnt]->timeusec($N->{'time-usec'});
+    $GPSpoints[$gps_cnt]->lat($N->{'lat'});
+    $GPSpoints[$gps_cnt]->lon($N->{'lon'});
+    $GPSpoints[$gps_cnt]->alt($N->{'alt'});
+    $GPSpoints[$gps_cnt]->spd($N->{'spd'});
+    $GPSpoints[$gps_cnt]->heading($N->{'heading'});
+    $GPSpoints[$gps_cnt]->fix($N->{'fix'});
+    $GPSpoints[$gps_cnt]->signal($N->{'signal'});
+    $GPSpoints[$gps_cnt]->quality($N->{'quality'});
+    $GPSpoints[$gps_cnt]->noise($N->{'noise'});
+
+    $gps_cnt++;
+
+    # if quiet is not set, we print some status
+    if(($QUIET == 0) and ($MSGLVL == 2)) {
+      if($procnt == 75) {
+        $procnt = 0;
+        print STDOUT "\b"x75;
+      }
+      print STDOUT "+";
+      $procnt++;
+    }
+  }
+
+  #&my_print($VERBOSE, "\n");
+  &my_print($VERBOSE, $gps_cnt." gps data units imported.");
+
+  return 0;
+
+} # sub read_k_xml
 
 # our filter function
 sub apply_filters {
@@ -920,7 +1282,7 @@ sub apply_filters {
 
   }
 
-  &my_print($VERBOSE, "\n");
+  #&my_print($VERBOSE, "\n");
   &my_print($VERBOSE, $net_count." networks remained after filtering.");
 
   return 0;
@@ -934,6 +1296,7 @@ sub calc_pos {
   my $minlat_in    = $_[1];
   my $maxlon_in    = $_[2];
   my $maxlat_in    = $_[3];
+  my $nbssid       = $_[4];
   my $altitude_out = 0;
   my $range_out    = 750;
   my $heading_out  = 0;
@@ -943,12 +1306,30 @@ sub calc_pos {
   my $lat_out      = 0.0;
   my $scale_out    = 0.0;
   my $dummy        = 0;
+  my $tmp_netgps_cnt = 0;
 
-  $dummy = ($maxlon_in - $minlon_in) / 2;
-  $lon_out = $minlon_in + $dummy;
+  if($kismet_gps_file ne "") {
+    for(my $tmp_gps_cnt = 0 ; $tmp_gps_cnt < $gps_cnt ; $tmp_gps_cnt++) {
+      if($GPSpoints[$tmp_gps_cnt]->bssid eq $nbssid) {
+        $lon_out += $GPSpoints[$tmp_gps_cnt]->lon;
+        $lat_out += $GPSpoints[$tmp_gps_cnt]->lat;
+        $tmp_netgps_cnt++;
+      }
+    }
+    if($tmp_netgps_cnt == 0) {
+      &my_print($VERBOSE, "WARNING: No gps data found for bssid $nbssid, using alternate position calculation!");
+      goto fallback_calc;
+    }
+    $lon_out /= $tmp_netgps_cnt;
+    $lat_out /= $tmp_netgps_cnt;
+  }else{
+    fallback_calc:
+    $dummy = ($maxlon_in - $minlon_in) / 2;
+    $lon_out = $minlon_in + $dummy;
 
-  $dummy = ($maxlat_in - $minlat_in) / 2;
-  $lat_out = $minlat_in + $dummy;
+    $dummy = ($maxlat_in - $minlat_in) / 2;
+    $lat_out = $minlat_in + $dummy;
+  }
 
   $coords_out = "$lon_out,$lat_out,0";
 
@@ -974,7 +1355,7 @@ sub generate {
 
   my $net_alpha       = sprintf("%x", $OPACITY);
   my $tmp_count       = 0;
-  my $col_count       = 1;
+  my $col_count       = 0;
   my $procnt          = 0;
 
   my $net_color       = 0;
@@ -1022,15 +1403,19 @@ sub generate {
   for( ; $tmp_count < $net_count ; $tmp_count++) {
 
     if($NCOLORS == 0) {
-      if($col_count == 15) {
-        $col_count = 1;
-      }
+      #if($col_count == 15) {
+      #  $col_count = 1;
+      #}
       $net_color = $CHANCOL[$col_count++];
-    }elsif($NCOLORS == 1) { # TODO: rewrite! -> @CRYPTCOL
-      if((defined $networks[$tmp_count]->nwep) and ($networks[$tmp_count]->nwep eq "true")) {
-        $net_color = $RED;
-      }else{
+    }elsif($NCOLORS == 1) { 
+      if(grep(/AES\-CCM/i, @{$networks[$tmp_count]->nencryption}) == 1) {
         $net_color = $GREEN;
+      }elsif(grep(/TKIP/i, @{$networks[$tmp_count]->nencryption}) == 1) {
+        $net_color = $YELLOW;
+      }elsif(grep(/WEP/i, @{$networks[$tmp_count]->nencryption}) == 1) {
+        $net_color = $ORANGE;
+      }else{
+        $net_color = $RED;
       }
     }elsif($NCOLORS == 2) {
       $net_color = $CHANCOL[$networks[$tmp_count]->nchannel];
@@ -1046,7 +1431,7 @@ sub generate {
       $net_name = "UNKNOWN";
     }
 
-    ($net_lon, $net_lat, $net_coords, $net_alt, $net_range, $net_head, $net_tilt, $net_scale_range) = split(/\|/, &calc_pos($networks[$tmp_count]->ngpsinfo->gminlon, $networks[$tmp_count]->ngpsinfo->gminlat, $networks[$tmp_count]->ngpsinfo->gmaxlon, $networks[$tmp_count]->ngpsinfo->gmaxlat));
+    ($net_lon, $net_lat, $net_coords, $net_alt, $net_range, $net_head, $net_tilt, $net_scale_range) = split(/\|/, &calc_pos($networks[$tmp_count]->ngpsinfo->gminlon, $networks[$tmp_count]->ngpsinfo->gminlat, $networks[$tmp_count]->ngpsinfo->gmaxlon, $networks[$tmp_count]->ngpsinfo->gmaxlat, $networks[$tmp_count]->nbssid));
 
     if(($net_lon != 0) and ($net_lat != 0)) {
       $net_lon_all += $net_lon;
@@ -1074,6 +1459,9 @@ sub generate {
       }
       if(defined $networks[$tmp_count]->nwep) {
         $net_desc .= "<b>Encrypted:</b> ".$networks[$tmp_count]->nwep."<br>\n";
+        foreach my $tmp_enc (@{$networks[$tmp_count]->nencryption}) {
+          $net_desc .= "<b>Enc.-Details:</b> ".$tmp_enc."<br>\n";
+        }
       }
       if(defined $networks[$tmp_count]->ncarrier) {
         $net_desc .= "<b>Carrier:</b> ".$networks[$tmp_count]->ncarrier."<br>\n";
@@ -1196,7 +1584,7 @@ sub generate {
     }
   }
 
-  &my_print($VERBOSE, "\n");
+  #&my_print($VERBOSE, "\n");
   &my_print($VERBOSE, "Writing Generated data to file ...");
 
   print OUTHANDLE $kml_header;
@@ -1280,9 +1668,18 @@ if(&process_opts() == -1) {
 
 &my_print($VERBOSE, "Reading $kismet_xml_file ... this may take a while!");
 
-if(&read_xml("$kismet_xml_file") != 0) {
-  &my_print($DEBUG, "An Error occoured while parsing the xml file!");
+if(&read_k_xml("$kismet_xml_file") != 0) {
+  &my_print($DEBUG, "An Error occoured while parsing the xml file ($kismet_xml_file)!");
   exit -1;
+}
+
+if($kismet_gps_file ne "") {
+  &my_print($VERBOSE, "Reading $kismet_gps_file ... this may take a while!");
+
+  if(&read_g_xml("$kismet_gps_file") != 0) {
+    &my_print($DEBUG, "An Error occoured while parsing the xml file ($kismet_gps_file)!");
+    exit -1;
+  }
 }
 
 if(&apply_filters() != 0) {
