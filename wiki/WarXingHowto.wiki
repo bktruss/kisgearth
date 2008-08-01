@@ -6,9 +6,9 @@
 i decided to write a small howto on how to warXing (wardrive/warwalk) the right way to get the best maps possible.
 
   * always have an eye on the gps fix! gps data without a 3d fix is next to useless!
-  * do not go/drive to fast! remeber channel hopping!
-    * e.g. b/g == 12 channels ; channelvelocity = 2 -> it would take about 6 seconds to hop threw all the channels. and to get reasonable results you should hop each channel at least three times per position -> 18 seconds
-  * walk/drive the right way - the best gps data could be collected like this:
+  * do not walk/drive to fast! remember channel hopping!
+    * e.g. b/g == 12 channels ; channelvelocity == 2 -> it would take about 6 seconds to hop threw all channels. to get reasonable results you should hop each channel at least three times per position -> 18 seconds.
+  * walk/drive the right way - the best gps data could be collected by warXing like this:
 
 {{{
        |   |   |                                           |   |   |
