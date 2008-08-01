@@ -12,7 +12,7 @@ i decided to write a small howto on how to warXing (wardrive/warwalk) the right 
 
 {{{
        |   |   |                                           |   |   |
-       |   |   |                                           |   |   |
+       |       |                                           |       |
        |   |   |                                           |   |   |
 -------+       +-------------------------------------------+       +------
 
@@ -20,21 +20,21 @@ i decided to write a small howto on how to warXing (wardrive/warwalk) the right 
    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 -------+      X+-------------------------------------------+X      +------
        |   |  X|                                           |X  |   |
-       |   |  X|   ++++                             ++++   |X  |   |
+       |      X|   ++++                             ++++   |X      |
        |   |  X|  +    +++++++++++++++++++++++++++++    +  |X  |   |
-       |   |  X|  +                                     +  |X  |   |
+       |      X|  +                                     +  |X      |
        |   |  X|   +                                   +   |X  |   |
+       |      X|   +                                   +   |X      |
        |   |  X|   +                                   +   |X  |   |
-       |   |  X|   +                                   +   |X  |   |
-       |   |  X|   +                                   +   |X  |   |
+       |      X|   +                                   +   |X      |
        |   |  X|   +         TARGETED_BUILDING         +   |X  |   |
+       |      X|   +                                   +   |X      |
        |   |  X|   +                                   +   |X  |   |
+       |      X|   +                                   +   |X      |
        |   |  X|   +                                   +   |X  |   |
-       |   |  X|   +                                   +   |X  |   |
-       |   |  X|   +                                   +   |X  |   |
-       |   |  X|  +                                     +  |X  |   |
+       |      X|  +                                     +  |X      |
        |   |  X|  +    +++++++++++++++++++++++++++++    +  |X  |   |
-       |   |  X|   ++++                             ++++   |X  |   |
+       |      X|   ++++                             ++++   |X      |
        |   |  X|                                           |X  |   |
 -------+      X+-------------------------------------------+X      +------
               XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -42,7 +42,7 @@ i decided to write a small howto on how to warXing (wardrive/warwalk) the right 
 
 -------+       +-------------------------------------------+       +------
        |   |   |                                           |   |   |
-       |   |   |                                           |   |   |
+       |       |                                           |       |
        |   |   |                                           |   |   |
 }}}
 
