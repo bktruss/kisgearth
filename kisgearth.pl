@@ -1311,9 +1311,18 @@ sub calc_pos {
   if($kismet_gps_file ne "") {
     for(my $tmp_gps_cnt = 0 ; $tmp_gps_cnt < $gps_cnt ; $tmp_gps_cnt++) {
       if($GPSpoints[$tmp_gps_cnt]->bssid eq $nbssid) {
-        $lon_out += $GPSpoints[$tmp_gps_cnt]->lon;
-        $lat_out += $GPSpoints[$tmp_gps_cnt]->lat;
-        $tmp_netgps_cnt++;
+        # here we go. a "little" improvement wich should help to make 
+        # the positioning more accurate. (anybody ever seen some values
+        # within the quality field of the *.gps files?)
+        if($GPSpoints[$tmp_gps_cnt]->signal > 0) {
+          $lon_out += ($GPSpoints[$tmp_gps_cnt]->lon * $GPSpoints[$tmp_gps_cnt]->signal);
+          $lat_out += ($GPSpoints[$tmp_gps_cnt]->lat * $GPSpoints[$tmp_gps_cnt]->signal);
+          $tmp_netgps_cnt+=$GPSpoints[$tmp_gps_cnt]->signal;
+        }else{
+          $lon_out += $GPSpoints[$tmp_gps_cnt]->lon;
+          $lat_out += $GPSpoints[$tmp_gps_cnt]->lat;
+          $tmp_netgps_cnt++;
+        }
       }
     }
     if($tmp_netgps_cnt == 0) {
