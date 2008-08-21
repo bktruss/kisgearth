@@ -444,6 +444,7 @@ my $ITYPEFILTER   = "";     # inverted type filter list
 #my $PCKTFILTER    = "";     # packet filter list
 #my $IPCKTFILTER   = "";     # inverted packet filter list
 my $CALCRANGE     = 0;      # calculate network range
+my $USESIGNAL     = 0;      # use the signal strength for position calculation
 my $DRAWCENTER    = 1;      # draw center of network
 my $CENTERSIZE    = 1;      # size for network center
 my $FROM          = "";     # started
@@ -582,6 +583,8 @@ sub usage {
   print STDOUT "                            2 is color based on network channel\n";
   print STDOUT " -r,  --calculate-range    Rudimentary trys to calculate the range of the wireless\n";
   print STDOUT "                           network based on the min/max coords\n";
+  print STDOUT " -s,  --use-signal         Enables the use of the signal strength for\n";
+  print STDOUT "                           network position calculation.\n";
   print STDOUT " -c,  --draw-center        Draws each network as a single dot [Default]\n";
   print STDOUT " -cS, --center-size <s>    Size of network center dot [1 to 4 ; Default 1]\n";
   print STDOUT " -a,  --alpha <h>          Draw opacity [1 to 255 ; Default: 127 (~50%)]\n";
@@ -666,6 +669,9 @@ sub process_opts {
     }elsif(($ARGV[$optcnt] eq '-r') or ($ARGV[$optcnt] eq '--calculate-range')) {
       $CALCRANGE = 1;
       &my_print($DEBUG, "Calculate Network Range activated!");
+    }elsif(($ARGV[$optcnt] eq '-s') or ($ARGV[$optcnt] eq '--use-signal')) {
+      $USESIGNAL = 1;
+      &my_print($DEBUG, "Calculate network position with the help of the signal strength!");
     }elsif(($ARGV[$optcnt] eq '-c') or ($ARGV[$optcnt] eq '--draw-center')) {
       $DRAWCENTER = 1;
       &my_print($DEBUG, "Draw Network Center activated!");
@@ -1314,7 +1320,7 @@ sub calc_pos {
         # here we go. a "little" improvement wich should help to make 
         # the positioning more accurate. (anybody ever seen some values
         # within the quality field of the *.gps files?)
-        if($GPSpoints[$tmp_gps_cnt]->signal > 0) {
+        if(($USESIGNAL == 1) and ($GPSpoints[$tmp_gps_cnt]->signal > 0)) {
           $lon_out += ($GPSpoints[$tmp_gps_cnt]->lon * $GPSpoints[$tmp_gps_cnt]->signal);
           $lat_out += ($GPSpoints[$tmp_gps_cnt]->lat * $GPSpoints[$tmp_gps_cnt]->signal);
           $tmp_netgps_cnt+=$GPSpoints[$tmp_gps_cnt]->signal;
