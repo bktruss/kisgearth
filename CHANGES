@@ -4,6 +4,12 @@ KisGearth - Changelog
 a summary of all changes...
 
 --
+version 0.01f
+--
+  another improvement for the AP positioning system
+  added (-s/--use-signal).
+
+--
 version 0.01e
 --
   improved AP positioning system added (-G/--gps).

@@ -32,6 +32,8 @@ based on their channel, calculates the range of the networks,
 draw the colors based on channels, filters on SSID samplessid and
 reads Kismet-Mar-02-2007-4.xml as input file.
 
+don't miss the -G and -s options ;)
+
 try it, you will see it is as easy as 1,2,3 ;)
 
 

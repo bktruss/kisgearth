@@ -2,7 +2,7 @@
 ################################################################################
 # KisGearth - a Kismet xml log to GoogleEarth kml converter
 ################################################################################
-# 0.01e - 2008.07.30 - by Richard Sammet (e-axe) richard.sammet@gmail.com
+# 0.01f - 2008.08.28 - by Richard Sammet (e-axe) richard.sammet@gmail.com
 ################################################################################
 # Information and latest version available at:
 # http://mytty.org/kisgearth/
@@ -34,7 +34,7 @@ $| = 1;
 
 # constants
 my $CODENAME    = 'KisGearth';
-my $VERSION     = '0.01e';
+my $VERSION     = '0.01f';
 my $AUTHOR      = 'Richard Sammet (e-axe)';
 my $CONTACT     = 'richard.sammet@gmail.com';
 my $WEBSITE     = 'http://mytty.org/kisgearth/';
