@@ -640,7 +640,7 @@ sub process_opts {
       exit 0;
     }elsif(($ARGV[$optcnt] eq '-V') or ($ARGV[$optcnt] eq '--version')) {
       &print_version();
-      return 0;
+      exit 0;
     }elsif(($ARGV[$optcnt] eq '-v') or ($ARGV[$optcnt] eq '--verbose')) {
       if($MSGLVL < 2) {
         $MSGLVL = 2;
