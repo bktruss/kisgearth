@@ -1641,7 +1641,7 @@ sub generate {
     </Document>
     ";
   }elsif($ORDER == 1) {
-    for($tmp_cnt = 1 ; $tmp_cnt <= 14 ; $tmp_cnt++) {
+    for($tmp_cnt = 0 ; $tmp_cnt <= 256 ; $tmp_cnt++) {
       if(defined $tmp_channel[$tmp_cnt]) {
         $tmp_channel[$tmp_cnt] = "   <Document>
         <name>Channel $tmp_cnt</name>
@@ -1657,7 +1657,7 @@ sub generate {
     print OUTHANDLE $tmp_crypt;
     print OUTHANDLE $tmp_uncrypt;
   }elsif($ORDER == 1) {
-    for($tmp_cnt = 1 ; $tmp_cnt <= 14 ; $tmp_cnt++) {
+    for($tmp_cnt = 0 ; $tmp_cnt <= 256 ; $tmp_cnt++) {
       if(defined $tmp_channel[$tmp_cnt]) {
         print OUTHANDLE $tmp_channel[$tmp_cnt];
       }
