@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 ################################################################################
-# KisGearth - a Kismet xml log to GoogleEarth kml converter
+# KisGearth - a Kismet xml log to GoogleEarth kml converter *KISMET NEWCORE VER*
 ################################################################################
+# 0.01g - 2010.01.19 - NewCore fixes by 'mon' katanga@gmail.com
 # 0.01f - 2008.08.28 - by Richard Sammet (e-axe) richard.sammet@gmail.com
 ################################################################################
 # Information and latest version available at:
@@ -34,8 +35,8 @@ $| = 1;
 
 # constants
 my $CODENAME    = 'KisGearth';
-my $VERSION     = '0.01f';
-my $AUTHOR      = 'Richard Sammet (e-axe)';
+my $VERSION     = '0.01g';
+my $AUTHOR      = 'Richard Sammet (e-axe) / mon (newcore fixes)';
 my $CONTACT     = 'richard.sammet@gmail.com';
 my $WEBSITE     = 'http://mytty.org/kisgearth/';
 
@@ -406,10 +407,10 @@ my @CHANCOL = (
 
 # crypt state colors
 my @CRYPTCOL = (
-  $GREEN,       # wpa2 -> AES-CCM
-  $YELLOW,      # wpa  -> TKIP
-  $ORANGE,      # wep  -> WEP
-  $RED          # none -> None
+  $RED,			# wpa2	-> AES-CCM
+  $ORANGE,		# wpa	-> TKIP || PSK
+  $YELLOW,		# wep	-> WEP
+  $GREEN		# none	-> None
 );
 
 # vaiable constants
@@ -447,11 +448,19 @@ my $CALCRANGE     = 0;      # calculate network range
 my $USESIGNAL     = 0;      # use the signal strength for position calculation
 my $DRAWCENTER    = 1;      # draw center of network
 my $CENTERSIZE    = 1;      # size for network center
-my $FROM          = "";     # started
-my $TO            = "";     # ended
+my $FROM          = "0";     # started
+my $TO            = "0";     # ended
 
 # global variables
 my @networks        = ();
+my @GPSpoints		= ();
+my @chanlist		= ();
+my @ichanlist		= ();
+my @carrlist		= ();
+my @icarrlist		= ();
+my @typelist		= ();
+my @itypelist		= ();
+my @tmp_channel		= ();
 my $net_count       = 0;
 my $gps_cnt         = 0;
 my $kismet_xml_file = '';
@@ -459,57 +468,59 @@ my $kismet_gps_file = '';
 
 # these are our structures ;)
 struct IPaddress => {
-  iprange =>  '$',
   iptype  =>  '$',
+  iprange =>  '$',
 };
 
 struct Packets => {
-  pcrypt  =>  '$',
   pLLC    =>  '$',
-  pdupeiv =>  '$',
-  pweak   =>  '$',
   pdata   =>  '$',
+  pcrypt  =>  '$',
+  pweak   =>  '$',
   ptotal  =>  '$',
   pivdupe =>  '$',
 };
 
 struct Gpsinfo => {
-  gminlon =>  '$',
-  gmaxspd =>  '$',
-  gminlat =>  '$',
-  gminspd =>  '$',
-  gminalt =>  '$',
   gunit   =>  '$',
+  gminlat =>  '$',
+  gminlon =>  '$',
+  gminalt =>  '$',
+  gminspd =>  '$',
   gmaxlat =>  '$',
   gmaxlon =>  '$',
   gmaxalt =>  '$',
+  gmaxspd =>  '$',
 };
 
 struct Network => {
   nnumber      =>  '$',
+  ntype        =>  '$',
+  nwep         =>  '$',
+  ncloaked     =>  '$',
+  nfirsttime   =>  '$',
+  nlasttime    =>  '$',
   nssid        =>  '$',
   nbssid       =>  '$',
   ninfo        =>  '$',
   nchannel     =>  '$',
-  nwep         =>  '$',
+  nmaxrate     =>  '$',
+  nmaxseenrate =>  '$',
   ncarrier     =>  '$',
   nencoding    =>  '$',
-  ncloaked     =>  '$',
-  ndatasize    =>  '$',
-  nmaxseenrate =>  '$',
-  nlasttime    =>  '$',
-  nfirsttime   =>  '$',
-  ntype        =>  '$',
-  nmaxrate     =>  '$',
   nencryption  =>  '@',
-  nwclient     =>  '$',
-  nipaddress   =>  'IPaddress',
   npackets     =>  'Packets',
   ngpsinfo     =>  'Gpsinfo',
+  nipaddress   =>  'IPaddress',
+  ndatasize    =>  '$',
+  nwclient     =>  '$',
+  nwcisco	   =>  '$',
+  nmanuf	   =>  '$',
 };
 
 struct GPSpoint => {
   bssid        =>  '$',
+  source	   =>  '$',
   timesec      =>  '$',
   timeusec     =>  '$',
   lat          =>  '$',
@@ -640,7 +651,7 @@ sub process_opts {
       exit 0;
     }elsif(($ARGV[$optcnt] eq '-V') or ($ARGV[$optcnt] eq '--version')) {
       &print_version();
-      exit 0;
+      return 0;
     }elsif(($ARGV[$optcnt] eq '-v') or ($ARGV[$optcnt] eq '--verbose')) {
       if($MSGLVL < 2) {
         $MSGLVL = 2;
@@ -892,52 +903,61 @@ sub read_k_xml {
   foreach $N (@{$data->{'wireless-network'}}) {
 
     $networks[$net_count] = Network->new();
-    $networks[$net_count]->nipaddress(new IPaddress);
-    $networks[$net_count]->npackets(new Packets);
-    $networks[$net_count]->ngpsinfo(new Gpsinfo);
 
     $networks[$net_count]->nnumber($N->{'number'});
-    $networks[$net_count]->nssid($N->{'SSID'});
-    $networks[$net_count]->nbssid($N->{'BSSID'});
-    $networks[$net_count]->ninfo($N->{'info'});
-    $networks[$net_count]->nchannel($N->{'channel'});
-    $networks[$net_count]->nwep($N->{'wep'});
-    $networks[$net_count]->ncarrier($N->{'carrier'});
-    $networks[$net_count]->nencoding($N->{'encoding'});
-    $networks[$net_count]->ncloaked($N->{'cloaked'});
-    $networks[$net_count]->ndatasize($N->{'datasize'});
-    $networks[$net_count]->nmaxseenrate($N->{'maxseenrate'});
-    $networks[$net_count]->nlasttime($N->{'last-time'});
-    $networks[$net_count]->nfirsttime($N->{'first-time'});
-    $networks[$net_count]->ntype($N->{'type'});
-    $networks[$net_count]->nmaxrate($N->{'maxrate'});
-
-    $networks[$net_count]->npackets->pcrypt($N->{'packets'}->{'crypt'});
+	
+	$networks[$net_count]->npackets(new Packets);
+	$networks[$net_count]->npackets->pcrypt($N->{'packets'}->{'crypt'});
     $networks[$net_count]->npackets->pLLC($N->{'packets'}->{'LLC'});
-    $networks[$net_count]->npackets->pdupeiv($N->{'packets'}->{'dupeiv'});
-    $networks[$net_count]->npackets->pweak($N->{'packets'}->{'weak'});
     $networks[$net_count]->npackets->pdata($N->{'packets'}->{'data'});
     $networks[$net_count]->npackets->ptotal($N->{'packets'}->{'total'});
+	$networks[$net_count]->npackets->pweak($N->{'packets'}->{'weak'});
     $networks[$net_count]->npackets->pivdupe($N->{'packets'}->{'ivdupe'});
-
-    $networks[$net_count]->ngpsinfo->gminlon($N->{'gps-info'}->{'min-lon'});
-    $networks[$net_count]->ngpsinfo->gmaxspd($N->{'gps-info'}->{'max-spd'});
-    $networks[$net_count]->ngpsinfo->gminlat($N->{'gps-info'}->{'min-lat'});
-    $networks[$net_count]->ngpsinfo->gminspd($N->{'gps-info'}->{'min-spd'});
+	
+	$networks[$net_count]->nchannel($N->{'channel'});
+	
+	$networks[$net_count]->nbssid($N->{'BSSID'});
+	
+	$networks[$net_count]->ngpsinfo(new Gpsinfo);
+	$networks[$net_count]->ngpsinfo->gminlon($N->{'gps-info'}->{'min-lon'});
+	$networks[$net_count]->ngpsinfo->gmaxspd($N->{'gps-info'}->{'max-spd'});
+	$networks[$net_count]->ngpsinfo->gminlat($N->{'gps-info'}->{'min-lat'});
+	$networks[$net_count]->ngpsinfo->gminspd($N->{'gps-info'}->{'min-spd'});
     $networks[$net_count]->ngpsinfo->gminalt($N->{'gps-info'}->{'min-alt'});
-    $networks[$net_count]->ngpsinfo->gunit($N->{'gps-info'}->{'unit'});
-    $networks[$net_count]->ngpsinfo->gmaxlat($N->{'gps-info'}->{'max-lat'});
-    $networks[$net_count]->ngpsinfo->gmaxlon($N->{'gps-info'}->{'max-lon'});
-    $networks[$net_count]->ngpsinfo->gmaxalt($N->{'gps-info'}->{'max-alt'});
+	$networks[$net_count]->ngpsinfo->gmaxlat($N->{'gps-info'}->{'max-lat'});
+	$networks[$net_count]->ngpsinfo->gmaxlon($N->{'gps-info'}->{'max-lon'});
+	$networks[$net_count]->ngpsinfo->gmaxalt($N->{'gps-info'}->{'max-alt'});
+    
+	$networks[$net_count]->ndatasize($N->{'datasize'});
+	
+	$networks[$net_count]->nmanuf($N->{'manuf'});
+	
+	$networks[$net_count]->nssid($N->{'SSID'}->{'essid'}->{'content'});
+    $networks[$net_count]->ntype($N->{'SSID'}->{'type'});
+	$networks[$net_count]->nwep($N->{'SSID'}->{'wep'});
+	$networks[$net_count]->ncloaked($N->{'SSID'}->{'essid'}->{'cloaked'});
+	$networks[$net_count]->nfirsttime($N->{'SSID'}->{'first-time'});
+	$networks[$net_count]->nlasttime($N->{'SSID'}->{'last-time'});
+    $networks[$net_count]->nmaxrate($N->{'SSID'}->{'maxrate'});	
+	
+	if(defined($N->{'SSID'}->{'encryption'})) {
+		if (($N->{'SSID'}->{'encryption'}) eq 'WEP') {
+			push(@{$networks[$net_count]->nencryption}, 'WEP');
+		} else {
+			foreach $E (@{$N->{'SSID'}->{'encryption'}}) {  		
+				push(@{$networks[$net_count]->nencryption}, $E);
+			}
+		}
+	}
 
-    $networks[$net_count]->nipaddress->iprange($N->{'ip-address'}->{'ip-range'});
-    $networks[$net_count]->nipaddress->iptype($N->{'ip-address'}->{'type'});
-
+    $networks[$net_count]->ninfo($N->{'info'});
+	$networks[$net_count]->nmaxseenrate($N->{'maxseenrate'});
+	$networks[$net_count]->ncarrier($N->{'carrier'});
+    $networks[$net_count]->nencoding($N->{'encoding'});
+	$networks[$net_count]->nipaddress(new IPaddress);
     $networks[$net_count]->nwclient($N->{'wireless-client'});
-
-    foreach $E (@{$N->{'encryption'}}) {  
-      push(@{$networks[$net_count]->nencryption}, $E);
-    }
+    $networks[$net_count]->nipaddress->iptype($N->{'ip-address'}->{'type'});
+    $networks[$net_count]->nipaddress->iprange($N->{'ip-address'}->{'ip-range'});
 
     $net_count++;
 
@@ -981,19 +1001,19 @@ sub read_g_xml {
   foreach $N (@{$data->{'gps-point'}}) {
 
     $GPSpoints[$gps_cnt] = GPSpoint->new();
-
-    $GPSpoints[$gps_cnt]->bssid($N->{'bssid'});
-    $GPSpoints[$gps_cnt]->timesec($N->{'time-sec'});
-    $GPSpoints[$gps_cnt]->timeusec($N->{'time-usec'});
-    $GPSpoints[$gps_cnt]->lat($N->{'lat'});
-    $GPSpoints[$gps_cnt]->lon($N->{'lon'});
-    $GPSpoints[$gps_cnt]->alt($N->{'alt'});
-    $GPSpoints[$gps_cnt]->spd($N->{'spd'});
-    $GPSpoints[$gps_cnt]->heading($N->{'heading'});
-    $GPSpoints[$gps_cnt]->fix($N->{'fix'});
-    $GPSpoints[$gps_cnt]->signal($N->{'signal'});
+	$GPSpoints[$gps_cnt]->source($N->{'source'});
+	$GPSpoints[$gps_cnt]->alt($N->{'alt'});
+	$GPSpoints[$gps_cnt]->lat($N->{'lat'});
+	$GPSpoints[$gps_cnt]->fix($N->{'fix'});
+	$GPSpoints[$gps_cnt]->noise($N->{'noise_dbm'});
+	$GPSpoints[$gps_cnt]->spd($N->{'spd'});
+	$GPSpoints[$gps_cnt]->heading($N->{'heading'});
+	$GPSpoints[$gps_cnt]->timeusec($N->{'time-usec'});
+	$GPSpoints[$gps_cnt]->bssid($N->{'bssid'});
+	$GPSpoints[$gps_cnt]->signal($N->{'signal_dbm'});
     $GPSpoints[$gps_cnt]->quality($N->{'quality'});
-    $GPSpoints[$gps_cnt]->noise($N->{'noise'});
+	$GPSpoints[$gps_cnt]->lon($N->{'lon'});
+	$GPSpoints[$gps_cnt]->timesec($N->{'time-sec'});
 
     $gps_cnt++;
 
@@ -1424,13 +1444,13 @@ sub generate {
       $net_color = $CHANCOL[$col_count++];
     }elsif($NCOLORS == 1) { 
       if(grep(/AES\-CCM/i, @{$networks[$tmp_count]->nencryption}) == 1) {
-        $net_color = $GREEN;
-      }elsif(grep(/TKIP/i, @{$networks[$tmp_count]->nencryption}) == 1) {
-        $net_color = $YELLOW;
-      }elsif(grep(/WEP/i, @{$networks[$tmp_count]->nencryption}) == 1) {
-        $net_color = $ORANGE;
-      }else{
         $net_color = $RED;
+      }elsif(grep(/TKIP/i, @{$networks[$tmp_count]->nencryption}) == 1) {
+        $net_color = $ORANGE;
+      }elsif(grep(/WEP/i, @{$networks[$tmp_count]->nencryption}) == 1) {
+	    $net_color = $YELLOW;
+      }else{
+        $net_color = $GREEN;
       }
     }elsif($NCOLORS == 2) {
       $net_color = $CHANCOL[$networks[$tmp_count]->nchannel];
@@ -1456,68 +1476,71 @@ sub generate {
     }
 
     if($INFOS eq "all") {
-      $net_desc = "<![CDATA[<hr>";
+      $net_desc = "<![CDATA[<hr>\n";
       if(defined $networks[$tmp_count]->nnumber) {
-        $net_desc .= "<b>Number:</b> ".$networks[$tmp_count]->nnumber."<br>\n";
+        $net_desc .= "<b>Number:</b> ".$networks[$tmp_count]->nnumber."<br />\n";
       }
       if(defined $networks[$tmp_count]->nssid) {
-        $net_desc .= "<b>SSID:</b> ".$networks[$tmp_count]->nssid."<br>\n";
-      }
+        $net_desc .= "<b>SSID:</b> ".$networks[$tmp_count]->nssid."<br />\n";
+	  }
       if(defined $networks[$tmp_count]->nbssid) {
-        $net_desc .= "<b>BSSID:</b> ".$networks[$tmp_count]->nbssid."<br>\n";
+        $net_desc .= "<b>BSSID:</b> ".$networks[$tmp_count]->nbssid."<br />\n";
+      }
+      if(defined $networks[$tmp_count]->nmanuf) {
+        $net_desc .= "<b>Manuf:</b> ".$networks[$tmp_count]->nmanuf."<br />\n";
       }
       if(defined $networks[$tmp_count]->ninfo) {
-        $net_desc .= "<b>Info:</b> ".$networks[$tmp_count]->ninfo."<br>\n";
+        $net_desc .= "<b>Info:</b> ".$networks[$tmp_count]->ninfo."<br />\n";
       }
       if(defined $networks[$tmp_count]->nchannel) {
-        $net_desc .= "<b>Channel:</b> ".$networks[$tmp_count]->nchannel."<br>\n";
+        $net_desc .= "<b>Channel:</b> ".$networks[$tmp_count]->nchannel."<br />\n";
       }
-      if(defined $networks[$tmp_count]->nwep) {
-        $net_desc .= "<b>Encrypted:</b> ".$networks[$tmp_count]->nwep."<br>\n";
+	  if(defined @{$networks[$tmp_count]->nencryption}) {
+        $net_desc .= "<b>Encrypted:</b> Yes<br />\n";
         foreach my $tmp_enc (@{$networks[$tmp_count]->nencryption}) {
-          $net_desc .= "<b>Enc.-Details:</b> ".$tmp_enc."<br>\n";
+          $net_desc .= "<b>Enc.-Details:</b> ".$tmp_enc."<br />\n";
         }
       }
       if(defined $networks[$tmp_count]->ncarrier) {
-        $net_desc .= "<b>Carrier:</b> ".$networks[$tmp_count]->ncarrier."<br>\n";
+        $net_desc .= "<b>Carrier:</b> ".$networks[$tmp_count]->ncarrier."<br />\n";
       }
       if(defined $networks[$tmp_count]->nencoding) {
-        $net_desc .= "<b>Encoding:</b> ".$networks[$tmp_count]->nencoding."<br>\n";
+        $net_desc .= "<b>Encoding:</b> ".$networks[$tmp_count]->nencoding."<br />\n";
       }
       if(defined $networks[$tmp_count]->ncloaked) {
-        $net_desc .= "<b>Cloaked:</b> ".$networks[$tmp_count]->ncloaked."<br>\n";
+        $net_desc .= "<b>Cloaked:</b> ".$networks[$tmp_count]->ncloaked."<br />\n";
       }
       if(defined $networks[$tmp_count]->ndatasize) {
-        $net_desc .= "<b>Datasize:</b> ".$networks[$tmp_count]->ndatasize."<br>\n";
+        $net_desc .= "<b>Datasize:</b> ".$networks[$tmp_count]->ndatasize."<br />\n";
       }
       if(defined $networks[$tmp_count]->nmaxseenrate) {
-        $net_desc .= "<b>Maxseenrate:</b> ".$networks[$tmp_count]->nmaxseenrate."<br>\n";
+        $net_desc .= "<b>Maxseenrate:</b> ".$networks[$tmp_count]->nmaxseenrate."<br />\n";
       }
       if(defined $networks[$tmp_count]->nfirsttime) {
-        $net_desc .= "<b>Firsttime:</b> ".$networks[$tmp_count]->nfirsttime."<br>\n";
+        $net_desc .= "<b>Firsttime:</b> ".$networks[$tmp_count]->nfirsttime."<br />\n";
       }
       if(defined $networks[$tmp_count]->nlasttime) {
-        $net_desc .= "<b>Lasttime:</b> ".$networks[$tmp_count]->nlasttime."<br>\n";
+        $net_desc .= "<b>Lasttime:</b> ".$networks[$tmp_count]->nlasttime."<br />\n";
       }
       if(defined $networks[$tmp_count]->ntype) {
-        $net_desc .= "<b>Type:</b> ".$networks[$tmp_count]->ntype."<br>\n";
+        $net_desc .= "<b>Type:</b> ".$networks[$tmp_count]->ntype."<br />\n";
       }
       if(defined $networks[$tmp_count]->nmaxrate) {
-        $net_desc .= "<b>Maxrate:</b> ".$networks[$tmp_count]->nmaxrate."<br>\n";
+        $net_desc .= "<b>Maxrate:</b> ".$networks[$tmp_count]->nmaxrate."<br />\n";
       }
       if(defined $networks[$tmp_count]->nwclient) {
-        $net_desc .= "<b>Have Clients:</b> true<br>\n";
+        $net_desc .= "<b>Have Clients:</b> true<br />\n";
       }
       if(defined $networks[$tmp_count]->nipaddress->iprange) {
-        $net_desc .= "<b>IP-Range:</b> ".$networks[$tmp_count]->nipaddress->iprange."<br>\n";
+        $net_desc .= "<b>IP-Range:</b> ".$networks[$tmp_count]->nipaddress->iprange."<br />\n";
       }
       if(defined $networks[$tmp_count]->nipaddress->iptype) {
-        $net_desc .= "<b>IP-Type:</b> ".$networks[$tmp_count]->nipaddress->iptype."<br>\n";
+        $net_desc .= "<b>IP-Type:</b> ".$networks[$tmp_count]->nipaddress->iptype."<br />\n";
       }
-      $net_desc .= "<hr>Generated with $CODENAME $VERSION<br>Website: $WEBSITE]]>";
+      $net_desc .= "<hr>Generated with $CODENAME $VERSION<br />Website: $WEBSITE]]>";
     }
 
-    $net_name     =~ s/(.)/"&#".ord($1).";"/eg;
+    #$net_name     =~ s/(.)/"&#".ord($1).";"/eg;
     $tmp_net_name = $net_name;
 
     $styles          = "    <Style id=\"${tmp_net_name}_normal\">
@@ -1551,13 +1574,13 @@ sub generate {
     ";
 
     if($ORDER == 0) {
-      if((defined $networks[$tmp_count]->nwep) and ($networks[$tmp_count]->nwep eq "true")) {
+      if(defined @{$networks[$tmp_count]->nencryption}) {
         $tmp_crypt .= $styles;
-      }elsif((defined $networks[$tmp_count]->nwep) and ($networks[$tmp_count]->nwep eq "false")) {
+      }else{
         $tmp_uncrypt .= $styles;
       }
     }elsif($ORDER == 1) {
-      $tmp_channel[$networks[$tmp_count]->nchannel] .= $styles
+      $tmp_channel[$networks[$tmp_count]->nchannel] .= $styles;
     }
 
     $placemark       = "      <Placemark>
@@ -1579,9 +1602,9 @@ sub generate {
     ";
 
     if($ORDER == 0) {
-      if((defined $networks[$tmp_count]->nwep) and ($networks[$tmp_count]->nwep eq "true")) {
+      if(defined @{$networks[$tmp_count]->nencryption}) {
         $tmp_crypt .= $placemark;
-      }elsif((defined $networks[$tmp_count]->nwep) and ($networks[$tmp_count]->nwep eq "false")) {
+      } else {
         $tmp_uncrypt .= $placemark;
       }
     }elsif($ORDER == 1) {
@@ -1600,13 +1623,13 @@ sub generate {
   }
 
   #&my_print($VERBOSE, "\n");
-  &my_print($VERBOSE, "Writing Generated data to file ...");
+  &my_print($VERBOSE, "Writing Generated data to file ... ");
 
   print OUTHANDLE $kml_header;
   print OUTHANDLE "<Document>
   <name>Kismet Imported - $OUTFNAME</name>
   <open>1</open>
-  <description><![CDATA[From: $FROM<br> To: $TO<hr>Generated with $CODENAME $VERSION<br>Website: $WEBSITE]]></description>
+  <description><![CDATA[From: $FROM<br /> To: wtf<hr>Generated with $CODENAME $VERSION<br />Website: $WEBSITE]]></description>
   ";
   if(($net_count-$net_false_cnt) > 0) {
     $net_lon_all = ($net_lon_all / ($net_count-$net_false_cnt));
@@ -1641,7 +1664,7 @@ sub generate {
     </Document>
     ";
   }elsif($ORDER == 1) {
-    for($tmp_cnt = 0 ; $tmp_cnt <= 256 ; $tmp_cnt++) {
+    for($tmp_cnt = 1 ; $tmp_cnt <= 14 ; $tmp_cnt++) {
       if(defined $tmp_channel[$tmp_cnt]) {
         $tmp_channel[$tmp_cnt] = "   <Document>
         <name>Channel $tmp_cnt</name>
@@ -1657,7 +1680,7 @@ sub generate {
     print OUTHANDLE $tmp_crypt;
     print OUTHANDLE $tmp_uncrypt;
   }elsif($ORDER == 1) {
-    for($tmp_cnt = 0 ; $tmp_cnt <= 256 ; $tmp_cnt++) {
+    for($tmp_cnt = 1 ; $tmp_cnt <= 14 ; $tmp_cnt++) {
       if(defined $tmp_channel[$tmp_cnt]) {
         print OUTHANDLE $tmp_channel[$tmp_cnt];
       }
